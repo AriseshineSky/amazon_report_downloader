@@ -454,7 +454,7 @@ class DisburseTask():
                     8: record['disburse_date'],
                     9: message
                     }
-            key = record['seller_id'] + '-' + record['marketplace']
+            key = record['account_code'] + '-' + record['marketplace']
             update_ignores = [0]
             for sheet in sheets:
                 sheet_api.append_or_insert_row(sheet, key=key, data=data, update_ignores=update_ignores, insertOnly=True)
