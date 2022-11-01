@@ -4,17 +4,6 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
-from pyactiveresource.connection import (
-    BadRequest,
-    UnauthorizedAccess,
-    ForbiddenAccess,
-    ResourceNotFound,
-    MethodNotAllowed,
-    ResourceConflict,
-    ResourceInvalid,
-    ClientError
-)
-
 try:
     import urllib3
     urllib3.disable_warnings()
@@ -87,40 +76,6 @@ default_filter_cond = {
     'picked_count': 2,
     'provider_type': 'fba'
 }
-
-
-def create_slug(text):
-    t = text.replace(" ", "-").strip().lower()
-    t = re.sub(r'[^a-z0-9\-]', '', t)
-    t = t[:75] if len(t) > 75 else t
-    t = t.replace("--", "-")
-
-    return t
-
-
-def opt_img(img):
-    if '._' in img:
-        filename = os.path.basename(img)
-        parts = filename.split('.')
-        filename = parts[0] + '.' + parts[len(parts) - 1]
-        img = os.path.dirname(img) + '/' + filename
-
-    return img
-
-
-critical_errors = (
-    UnauthorizedAccess,
-    ForbiddenAccess
-)
-errors_not_retry = (
-    BadRequest,
-    ResourceNotFound,
-    MethodNotAllowed,
-    ResourceConflict,
-    ResourceInvalid,
-    ClientError
-)
-
 
 def has_offer(asin, offers):
     return asin in offers and offers[asin] is not False and offers[asin] is not None and offers[asin]['price'] > 0

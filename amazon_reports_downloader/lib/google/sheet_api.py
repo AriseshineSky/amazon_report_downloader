@@ -8,7 +8,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from service_provider import GoogleServiceProvider
+from amazon_reports_downloader.lib.google.service_provider import GoogleServiceProvider
 import gspread
 
 

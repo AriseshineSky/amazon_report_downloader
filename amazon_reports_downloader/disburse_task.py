@@ -12,7 +12,7 @@ from amazon_reports_downloader.payments_manager import PaymentsManager
 from amazon_reports_downloader.transfer_manager import TransferManager
 
 from amazon_reports_downloader.utils import close_web_driver
-from lib.google.sheet_api import SheetAPI
+from amazon_reports_downloader.lib.google.sheet_api import SheetAPI
 sheet_api = SheetAPI()
 
 class DisburseTask():
@@ -442,9 +442,8 @@ class DisburseTask():
             except Exception as e:
                 logger.exception(e)
 
-  
         if len(sheets) > 0:
-            data = {0: record['seller_id'],
+            data = {0: '%s-%s' % (record['account_code'], record['marketplace']),
                     1: record['account_code'],
                     2: record['marketplace'],
                     3: amount,
@@ -453,20 +452,12 @@ class DisburseTask():
                     6: record.get('instant_transfer_balance', amount),
                     7: record.get('request_transfer_available', True),
                     8: record['disburse_date'],
-                    9: '%s-%s' % (record['seller_id'], record['marketplace']),
-                    10: message
+                    9: message
                     }
             key = record['seller_id'] + '-' + record['marketplace']
             update_ignores = [0]
             for sheet in sheets:
-                sheet_api.append_or_insert_row(sheet, key=key, data=data, update_ignores=update_ignores, insertOnly=insert_only)
-
-        try:
-            result = self.disburses_api.disburse_post({'disburse': formatted_disburse})
-        except Exception as e:
-            logger.exception(e)
-
-        return result
+                sheet_api.append_or_insert_row(sheet, key=key, data=data, update_ignores=update_ignores, insertOnly=True)
 
     def get_disburse_records(self, seller_id, marketplace, date=None):
         if date is None:
