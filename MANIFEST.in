@@ -1,0 +1,4 @@
+include requirements.txt
+include README.md
+include amazon_reports_downloader/VERSION
+graft amazon_reports_downloader/bin
