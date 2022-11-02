@@ -256,8 +256,10 @@ class PaymentsManager(object):
         disburse_button = self.get_disburse_button_v1()
         if disburse_button is not None:
             return disburse_button
-
-        return self.get_disburse_button_v2()
+        disburse_button = self.get_disburse_button_v2()
+        if disburse_button is not None:
+            return disburse_button
+        return self.get_disburse_button_v3()
 
     def get_disburse_button_v1(self):
         disburse_button = None
@@ -283,6 +285,31 @@ class PaymentsManager(object):
             pass
 
         return disburse_button
+    
+    def get_disburse_button_v3(self):
+        disburse_button = None
+        try:
+            summary_elem = WebDriverWait(self.driver, 12).until(
+                EC.presence_of_element_located(
+                    (By.XPATH,
+                     '//kat-card[@class="linkable-multi-row-card"][descendant::section[@class="available-balance-header"]]')))
+            kat_button = summary_elem.find_element_by_xpath(
+                './div[@class="linkable-multi-row-card-rows-container"]/div[1]/div[@class="available-balance-row-with-children"]/div[@class="custom-child-available-balance"]/kat-button')
+            disburse_button = self.query_shadow_dom(kat_button, "button")
+        except (NoSuchElementException, TimeoutException) as e:
+            pass
+
+        return disburse_button
+
+    def get_shadow_dom(self, shadow_host_elem):
+        show_dom = self.driver.execute_script('return arguments[0].shadowRoot;', shadow_host_elem)
+        return show_dom
+    
+    def query_shadow_dom(self, shadow_host_elem, css_selector):
+        return self.driver.execute_script('return arguments[0].shadowRoot.querySelector("{}");'.format(css_selector), shadow_host_elem)
+
+    def query_shadow_dom_all(self, shadow_host_elem, css_selector):
+        return self.driver.execute_script('return arguments[0].shadowRoot.querySelectorAll("{}");'.format(css_selector), shadow_host_elem)
 
     def trigger_disburse(self):
         disburse_button = self.get_disburse_button()
