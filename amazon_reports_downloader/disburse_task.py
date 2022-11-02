@@ -112,6 +112,7 @@ class DisburseTask():
 
         if record['status'] == 'TRANSFER_SUCCEED':
             self.operation_recorder.record('disburse_attempt', record)
+            self.save_disburse(record)
 
     def disburse(self, seller_id, marketplace, email, password, min_disburse_amount, code=None, retry_in_visible_area=False):
         currency = CurrencyMapping.get_currency(marketplace)
