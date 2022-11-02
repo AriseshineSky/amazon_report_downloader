@@ -14,6 +14,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.keys import Keys
 
 from amazon_reports_downloader import MARKETPLACE_MAPPING, MARKETPLACE_MAPPING_V2
+from amazon_reports_downloader import logger
 
 
 class SellerLoginHelper(object):
@@ -127,7 +128,6 @@ class SellerLoginHelper(object):
 
     def pick_marketplace_v2(self):
         result = False
-        logger = logging.getLogger('AmazonSellerManagement')
         current_marketplace_xpath = '//*[@id="partner-switcher"]/button'
         marketplace_elem = WebDriverWait(self.driver, 4).until(
                     EC.visibility_of_element_located((By.XPATH, current_marketplace_xpath)))
