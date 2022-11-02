@@ -59,10 +59,7 @@ def disburse(config_path):
     seller_id = config['account']['seller_id']
     code = config['account']['acc']
     domain = config['account']['domain']
-
-    marketplaces = ['US']
-   
-
+    marketplaces = config['account']['marketplace']
     min_disburse_amount = 100
     exchange_rate = EcbExchangeRate()
     rates = exchange_rate.get_exchange_rate('USD')
