@@ -258,6 +258,21 @@ class DisburseTask():
                 })
 
                 return record
+            
+            if instant_transfer_balance <= min_disburse_amount:
+                # Instant transfer balance is 0, try again later
+                logger.info(
+                    '[ZeroInstantTransferBalance] SellerID: %s, Marketplace: %s',
+                    seller_id, marketplace)
+
+                record.update({
+                    'status': 'ZERO_INSTANT_TRANSFER_AMOUNT',
+                    'amount': 0,
+                    'disbursed': True,
+                    'message': 'ZeroInstantTransferBalance'
+                })
+
+                return record
 
             disburse_button_disabled = payments_manager.is_disburse_button_disabled(
                 disburse_button)
@@ -275,20 +290,7 @@ class DisburseTask():
 
                 return record
 
-            if instant_transfer_balance < min_disburse_amount:
-                # Instant transfer balance is 0, try again later
-                logger.info(
-                    '[ZeroInstantTransferBalance] SellerID: %s, Marketplace: %s',
-                    seller_id, marketplace)
-
-                record.update({
-                    'status': 'ZERO_INSTANT_TRANSFER_AMOUNT',
-                    'amount': 0,
-                    'disbursed': instant_transfer_balance > 0,
-                    'message': 'ZeroInstantTransferBalance'
-                })
-
-                return record
+            
 
             result = payments_manager.trigger_disburse()
             if not result:
