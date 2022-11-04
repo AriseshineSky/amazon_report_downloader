@@ -436,7 +436,7 @@ class DisburseTask():
         result = None
 
         sheet_id = "1b8wHMP05Na4ELcyP5Jn9syb9g6uMc8FkBTsckOCIz7w"
-        sheet_name = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%m/%d')
+        sheet_name = datetime.datetime.strptime(record['disburse_date'], '%Y-%m-%dT%H:%M:%S').strftime('%m/%d')
         sheets = list()
         if len(sheets) == 0:
             try:
