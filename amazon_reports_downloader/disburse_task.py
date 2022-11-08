@@ -1,6 +1,6 @@
 import datetime
 import time
-
+import pytz
 from amazon_reports_downloader.currency_mapping import CurrencyMapping
 
 from amazon_reports_downloader import (
@@ -14,7 +14,7 @@ from amazon_reports_downloader.transfer_manager import TransferManager
 from amazon_reports_downloader.utils import close_web_driver
 from amazon_reports_downloader.lib.google.sheet_api import SheetAPI
 sheet_api = SheetAPI()
-
+chicagoTz = pytz.timezone("America/Chicago") 
 class DisburseTask():
     def __init__(self, seller_id, marketplace, email, password, seller_profit_domain,
         rates, min_disburse_amount, code=None):
@@ -35,7 +35,8 @@ class DisburseTask():
 
     def run(self):
         # Get last disburse record and check whether disbursed in one day
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(chicagoTz)
+
         last_record_time, last_record = self.get_latest_disburse_record_local(
             self.seller_id, self.marketplace, self.code)
 
@@ -48,6 +49,11 @@ class DisburseTask():
                     last_disburse_date = last_record_time
             else:
                 last_disburse_date = last_record_time
+
+            if last_disburse_date.tzinfo is None:
+                LOCAL_TIMEZONE = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+                last_disburse_date = last_disburse_date.replace(tzinfo=LOCAL_TIMEZONE)
+        
             time_passed = now - last_disburse_date
             disbursed_in_one_day = time_passed < datetime.timedelta(days=1, minutes=15)
 
@@ -223,8 +229,7 @@ class DisburseTask():
                 unavailable_balance_in_usd = round(unavailable_balance / rate, 2)
             else:
                 unavailable_balance_in_usd = 0
-
-            disburse_date = datetime.datetime.now()
+            disburse_date = datetime.datetime.now(chicagoTz)
             disburse_date_str = disburse_date.strftime('%Y-%m-%dT%H:%M:%S%z')
             record = {
                 'seller_id': seller_id,
@@ -388,7 +393,7 @@ class DisburseTask():
             close_web_driver(driver)
 
     def upload_history_records(self, days=14):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(chicagoTz)
         max_time_passed = days * 24 * 3600
         disburse_records = self.operation_recorder.get_records('disburse')
         for record in disburse_records:
@@ -400,7 +405,16 @@ class DisburseTask():
                     disburse_date = record['time']
             else:
                 disburse_date = record['time']
+
+            LOCAL_TIMEZONE = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+            disburse_date = disburse_date.replace(tzinfo=LOCAL_TIMEZONE)
+            
+            if disburse_date.tzinfo is None:
+                LOCAL_TIMEZONE = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+                disburse_date = disburse_date.replace(tzinfo=LOCAL_TIMEZONE)
+
             time_passed = (now - disburse_date).total_seconds()
+            
             if time_passed > max_time_passed:
                 continue
 
@@ -415,6 +429,15 @@ class DisburseTask():
                 logger.exception(e)
 
             time.sleep(1.5)
+
+    def check_exist_in_template(self, record):
+        key = record['account_code'] + '-' + record['marketplace']
+        sheet_id = "1b8wHMP05Na4ELcyP5Jn9syb9g6uMc8FkBTsckOCIz7w"
+        sheet_name = "template"
+        worksheet = sheet_api.create_new_sheet_if_not_existed(sheet_id, sheet_name=sheet_name)
+        data = {0: '%s-%s' % (record['account_code'], record['marketplace'])}
+        update_ignores = [0]
+        sheet_api.append_or_insert_row(worksheet, key=key, data=data, update_ignores=update_ignores, insertOnly=True)
 
     def save_disburse(self, record):
         amount = record.get('amount', record.get('disbursed_amount', 0))
@@ -436,8 +459,11 @@ class DisburseTask():
         result = None
 
         sheet_id = "1b8wHMP05Na4ELcyP5Jn9syb9g6uMc8FkBTsckOCIz7w"
-        sheet_name = datetime.datetime.strptime(record['disburse_date'], '%Y-%m-%dT%H:%M:%S').strftime('%m/%d')
+        
+        chicagoTz = pytz.timezone("America/Chicago") 
+        sheet_name = datetime.datetime.now(chicagoTz).strftime('%m/%d')
         sheets = list()
+        self.check_exist_in_template(record)
         if len(sheets) == 0:
             try:
                 worksheet = sheet_api.create_new_sheet_if_not_existed(sheet_id, sheet_name=sheet_name)
@@ -460,11 +486,11 @@ class DisburseTask():
             key = record['account_code'] + '-' + record['marketplace']
             update_ignores = [0]
             for sheet in sheets:
-                sheet_api.append_or_insert_row(sheet, key=key, data=data, update_ignores=update_ignores, insertOnly=True)
+                sheet_api.append_or_insert_row(sheet, key=key, data=data, update_ignores=update_ignores, insertOnly=False)
 
     def get_disburse_records(self, seller_id, marketplace, date=None):
         if date is None:
-            date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+            date = datetime.datetime.now(chicagoTz).strftime('%Y-%m-%d')
 
         disburses = []
         
@@ -499,7 +525,9 @@ class DisburseTask():
 
     def filter_disbursed_records(self, record_time, record, seller_id, marketplace, code=None):
         marketplace = marketplace.lower()
-        now = datetime.datetime.now()
+
+        
+        now = datetime.datetime.now(chicagoTz)
 
         if 'disburse_date' in record and record['disburse_date']:
             try:
@@ -509,7 +537,14 @@ class DisburseTask():
                 disburse_date = record_time
         else:
             disburse_date = record_time
+
+
+        if disburse_date.tzinfo is None:
+            LOCAL_TIMEZONE = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+            disburse_date = disburse_date.replace(tzinfo=LOCAL_TIMEZONE)
+
         time_passed = now - disburse_date
+        
         disbursed_in_one_day = time_passed < datetime.timedelta(days=1, minutes=15)
 
         return disbursed_in_one_day and record.get('disbursed', False) and \
