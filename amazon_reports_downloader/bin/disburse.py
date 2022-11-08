@@ -60,7 +60,7 @@ def disburse(config_path):
     code = config['account']['acc']
     domain = config['account']['domain']
     marketplaces = config['account']['marketplace']
-    min_disburse_amount = 0
+    min_disburse_amount = 200
     exchange_rate = EcbExchangeRate()
     rates = exchange_rate.get_exchange_rate('USD')
     email = config['account']['email']
