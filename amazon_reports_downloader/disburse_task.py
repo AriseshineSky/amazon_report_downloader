@@ -459,9 +459,8 @@ class DisburseTask():
         result = None
 
         sheet_id = "1b8wHMP05Na4ELcyP5Jn9syb9g6uMc8FkBTsckOCIz7w"
-        
-        chicagoTz = pytz.timezone("America/Chicago") 
-        sheet_name = datetime.datetime.now(chicagoTz).strftime('%m/%d')
+        disburse_date = datetime.datetime.strptime(record['disburse_date'], '%Y-%m-%dT%H:%M:%S%z')
+        sheet_name = disburse_date.strftime('%m/%d')
         sheets = list()
         self.check_exist_in_template(record)
         if len(sheets) == 0:
