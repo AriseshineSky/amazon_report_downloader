@@ -16,7 +16,10 @@ from amazon_reports_downloader.exchange_rate import EcbExchangeRate
 
 from amazon_reports_downloader import logger
 from amazon_reports_downloader.disburse_task import DisburseTask
-
+import datetime
+import time
+import pytz
+chicagoTz = pytz.timezone("America/Chicago") 
 
 @click.command()
 @click.option('-c', '--config_path', help='Configuration file path.')
@@ -66,13 +69,17 @@ def disburse(config_path):
     email = config['account']['email']
     password = config['account']['password']
 
-    for marketplace in marketplaces:
-        disburse_task = DisburseTask(
-            seller_id, marketplace, email, password, domain, rates, min_disburse_amount, code)
-        try:
-            disburse_task.run()
-        except Exception as e:
-            logger.exception(e)
+    now = datetime.datetime.now(chicagoTz)
+    start_time = datetime.datetime.strptime(str(datetime.datetime.now(chicagoTz).date()) + '0:00', '%Y-%m-%d%H:%M').replace(tzinfo=chicagoTz)
+    end_time = datetime.datetime.strptime(str(datetime.datetime.now(chicagoTz).date()) + '17:00', '%Y-%m-%d%H:%M').replace(tzinfo=chicagoTz)
+    if now > start_time and now < end_time:
+        for marketplace in marketplaces:
+            disburse_task = DisburseTask(
+                seller_id, marketplace, email, password, domain, rates, min_disburse_amount, code)
+            try:
+                disburse_task.run()
+            except Exception as e:
+                logger.exception(e)
 
 
 if __name__ == '__main__':
