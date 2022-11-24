@@ -44,7 +44,7 @@ class DisburseTask():
             if 'disburse_date' in last_record and last_record['disburse_date']:
                 try:
                     last_disburse_date = datetime.datetime.strptime(
-                        last_record['disburse_date'], '%Y-%m-%dT%H:%M')
+                        last_record['disburse_date'], '%Y-%m-%dT%H:%M:%S%z')
                 except:
                     last_disburse_date = last_record_time
             else:
@@ -400,7 +400,7 @@ class DisburseTask():
             if 'disburse_date' in record and record['disburse_date']:
                 try:
                     disburse_date = datetime.datetime.strptime(
-                        record['disburse_date'], '%Y-%m-%dT%H:%M')
+                        record['disburse_date'], '%Y-%m-%dT%H:%M:%S%z')
                 except:
                     disburse_date = record['time']
             else:
@@ -531,7 +531,7 @@ class DisburseTask():
         if 'disburse_date' in record and record['disburse_date']:
             try:
                 disburse_date = datetime.datetime.strptime(
-                    record['disburse_date'], '%Y-%m-%dT%H:%M')
+                    record['disburse_date'], '%Y-%m-%dT%H:%M:%S%z')
             except:
                 disburse_date = record_time
         else:
