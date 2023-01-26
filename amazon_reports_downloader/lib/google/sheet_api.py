@@ -140,11 +140,16 @@ class SheetAPI(object):
             return
         if insertOnly:
             return
+
+        if (self.check_cell_empty(worksheet, cell.row, 4) and self.check_cell_empty(worksheet, cell.row, 5)):
+            return
         for col, value in data.items():
             if col in update_ignores:
                 continue
             self.update_cell(worksheet, cell.row, col + 1, value)
 
+    def check_cell_empty(self, worksheet, row, col):
+        return worksheet.cell(row, col).value is None
 
 if __name__ == '__main__':
     sheet_api = SheetAPI()
