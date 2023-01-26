@@ -140,8 +140,8 @@ class SheetAPI(object):
             return
         if insertOnly:
             return
-
-        if (self.check_cell_empty(worksheet, cell.row, 4) and self.check_cell_empty(worksheet, cell.row, 5)):
+        if (not self.check_cell_empty(worksheet, cell.row, 4) or not self.check_cell_empty(worksheet, cell.row, 5)):
+            print('already record')
             return
         for col, value in data.items():
             if col in update_ignores:
