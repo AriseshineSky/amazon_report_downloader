@@ -1,0 +1,6 @@
+{"seller_id": "ANDDF0E8IRDZ5", "marketplace": "CA", "report_path": "C:\\AmazonReportDownloader\\order_report\\CA\\24047697039018557.txt", "time": "20201022T055425.919839"}
+{"seller_id": "ANDDF0E8IRDZ5", "marketplace": "US", "report_path": "C:\\AmazonReportDownloader\\order_report\\US\\24045533883018557.txt", "time": "20201022T061636.103602"}
+{"seller_id": "ANDDF0E8IRDZ5", "marketplace": "CA", "report_path": "C:\\AmazonReportDownloader\\order_report\\CA\\24050671668018557.txt", "time": "20201022T062559.230583"}
+{"seller_id": "ANDDF0E8IRDZ5", "marketplace": "US", "report_path": "C:\\AmazonReportDownloader\\order_report\\US\\24047740355018557.txt", "time": "20201022T071535.017518"}
+{"seller_id": "ANDDF0E8IRDZ5", "marketplace": "US", "report_path": "C:\\AmazonReportDownloader\\order_report\\US\\24038229279018557.txt", "time": "20201022T081622.777554"}
+{"seller_id": "ANDDF0E8IRDZ5", "marketplace": "CA", "report_path": "C:\\AmazonReportDownloader\\order_report\\CA\\24050794717018557.txt", "time": "20201022T082431.775063"}
